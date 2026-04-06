@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cloud File Upload</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI','Poppins', sans-serif;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing:antialiased;
+ }
+ h2{
+  font-size: 26px;
+  font-weight: bolder;
+  letter-spacing: 0.5px;
+  color: #1e293b;
+}
+
+.box {
+  /* background: rgba(255,255,255,0.95); */
+  background: rgba(255, 255, 255, 0.55); /* transparent glass */
+  backdrop-filter: blur(12px); /* blur effect */
+  -webkit-backdrop-filter: blur(12px); /* for safari */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 30px;
+  width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  padding: 30px;
+  border-radius: 12px;
+  width: 550px;
+  text-align: center;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.fileCard {
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+button {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  font-weight: 600;
+  letter-spacing:0.3px;
+  padding: 10px 20px;
+  border: none;
+  background: #2575fc;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.filecard:hover{
+  transform: scale(1.01);
+  transition:0.2s;
+}
+button:hover {
+  background: #1a5edb;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>Upload File to Cloud ☁️</h2>
+<!-- Drag & Drop -->
+<div id="dropArea" style="border-color: #2575fc;background:rgba(37,117,252,0.1);border:2px dashed #aaa; font-size: 16px;font: weight 500; padding:25px; border-radius:10px; cursor:pointer;transform: scale(1.02);transition: 0.2s">
+  Drag & Drop files OR click to select
+  <input type="file" id="fileInput" multiple hidden>
+</div>
+
+<p style="color:rgba(255, 255, 255, 0.9); font-weight:500;">Max file size: 5MB per file</p>
+
+<div id="fileList"></div>
+<div style="margin-top:20px; text-align:center;">
+  <button id="uploadBtn" style="transition:0.2s; padding:12px 26px;font-size: 17px; border-radius: 8px;"
+   onmouseover="this.style.transform='scale(1.05)'"
+   onmouseout="this.style.transform='scale(1)'">Upload</button>
+
+  <p id="sasInfo" style="display:none; margin-top:10px; background: rgba(0,0,0,0.25); color: #fff; padding:8px 12px; border-radius:8px;backdrop-filter: blur
+  (6px);">
+    ⏳ SAS valid for ~1 hour
+  </p>
+
+  <button id="removeAllBtn" style="
+    display:none;
+    margin:10px auto 0 auto;
+    background:red;
+    color:white;
+    border:none;
+    padding:10px 22px;
+    font-size:16px;
+    border-radius:6px;
+  ">
+    🗑️ Remove All
+  </button>
+</div>
+</div>
+
+<script>
+const fileInput = document.getElementById("fileInput");
+const dropArea = document.getElementById("dropArea");
+const fileList = document.getElementById("fileList");
+const uploadBtn = document.getElementById("uploadBtn");
+const removeAllBtn = document.getElementById("removeAllBtn");
+const sasInfo = document.getElementById("sasInfo");
+
+let filesArray = [];
+
+// Click select
+dropArea.addEventListener("click", () => fileInput.click());
+
+// Select files
+fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
+
+// Drag drop
+dropArea.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropArea.classList.add("dragover");
+});
+
+dropArea.addEventListener("dragleave", () => {
+  dropArea.classList.remove("dragover");
+});
+
+dropArea.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropArea.classList.remove("dragover");
+  handleFiles(e.dataTransfer.files);
+});
+
+// Handle files
+function handleFiles(files) {
+  for (let file of files) {
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert(file.name + " exceeds 5MB ❌");
+      continue;
+    }
+
+    filesArray.push(file);
+    renderFile(file);
+  }
+}
+
+// Render file
+function renderFile(file) {
+
+  removeAllBtn.style.display = "block";
+
+  const div = document.createElement("div");
+  div.classList.add("fileCard");
+  div.style.border = "1px solid #ddd";
+  div.style.padding = "15px";
+  div.style.marginTop = "15px";
+  div.style.borderRadius = "10px";
+
+  div.innerHTML = `
+    <div style="display:flex; justify-content:space-between;">
+      <div>
+        <b>${file.name}</b><br>
+        <small>${(file.size/1024).toFixed(1)} KB</small>
+      </div>
+
+      <button class="removeBtn"
+      style="background:#ff4d4d;
+      color:white;
+      width:32px;
+      height:32px;
+      align-items:center;
+      justify-content:center;
+      border:none;
+      padding:4px 6px;
+      font-size:15px;
+      border-radius:6px;">✖</button>
+    </div>
+
+    <div style="margin-top:10px; background:#ddd; height:8px; border-radius:10px;">
+      <div class="progress" style="width:0%; display:none; height:100%; background: linear-gradient(to right,#2575fc,#6a11cb); border-radius:10px;"></div>
+    </div>
+
+    <p class="status"></p>
+    <div class="actions" style="display:flex; gap:10px;"></div>
+  `;
+
+  // Remove before upload
+  div.querySelector(".removeBtn").addEventListener("click", () => {
+    div.remove();
+    filesArray = filesArray.filter(f => f !== file);
+
+    if (filesArray.length === 0) {
+      removeAllBtn.style.display = "none";
+      sasInfo.style.display = "none";
+    }
+  });
+
+  fileList.appendChild(div);
+}
+
+// Upload all
+uploadBtn.addEventListener("click", async () => {
+
+  if (filesArray.length === 0) {
+    alert("No files selected ❌");
+    return;
+  }
+
+  const res = await fetch("https://files-upload-backend-1.onrender.com/get-sas");
+  const data = await res.json();
+  const sasUrl = data.sasUrl;
+
+  sasInfo.style.display = "block";
+
+  const cards = fileList.children;
+
+  for (let i = 0; i < filesArray.length; i++) {
+    uploadSingle(filesArray[i], cards[i], sasUrl);
+  }
+});
+
+// Upload single
+function uploadSingle(file, card, sasUrl) {
+
+  const uploadUrl = sasUrl.replace("?", "/" + file.name + "?");
+const progressBar = card.querySelector(".progress");
+  const statusText = card.querySelector(".status");
+  const actions = card.querySelector(".actions");
+
+  progressBar.style.display = "block";
+
+  let progress = 0;
+  const fakeProgress = setInterval(() => {
+    progress += 10;
+    if (progress <= 90) {
+      progressBar.style.width = progress + "%";
+    }
+  }, 100);
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("PUT", uploadUrl);
+
+  xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
+  xhr.setRequestHeader("Content-Type", file.type);
+
+  xhr.onload = () => {
+    clearInterval(fakeProgress);
+    progressBar.style.width = "100%";
+
+    if (xhr.status === 201) {
+
+      statusText.innerHTML = "✅ Uploaded";
+
+      const finalUrl = uploadUrl.split("?")[0];
+
+      actions.innerHTML = `
+        <button onclick="window.open('${finalUrl}')"style="background:#28a745; transition:0.2s;"
+onmouseover="this.style.background='#218838'"
+onmouseout="this.style.background='#28a745'"">🔓 Open</button>
+        <button onclick="copyLink('${finalUrl}')">🔗 Copy Link</button>
+      `;
+
+     /*  const removeBtn = actions.querySelector(".removeSingle");
+
+      removeBtn.addEventListener("click", () => {
+        card.remove();
+        filesArray = filesArray.filter(f => f !== file);
+
+        if (filesArray.length === 0) {
+          removeAllBtn.style.display = "none";
+          sasInfo.style.display = "none";
+        }
+      }); */
+
+    } else {
+      statusText.innerHTML = "❌ Failed";
+    }
+  };
+
+  xhr.send(file);
+}
+
+// Copy
+function copyLink(url) {
+  navigator.clipboard.writeText(url);
+  alert("Copied!");
+}
+
+// Remove all
+removeAllBtn.addEventListener("click", () => {
+  fileList.innerHTML = "";
+  filesArray = [];
+  removeAllBtn.style.display = "none";
+  sasInfo.style.display = "none";
+});
+</script>
+
+</body>
+</html>
