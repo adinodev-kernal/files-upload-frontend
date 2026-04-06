@@ -1,8 +1,11 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name ="viewport"
+content="width=device-width,initial-scale=1.0">
 <title>Cloud File Upload</title>
 
 <style>
@@ -10,11 +13,12 @@ body {
   margin: 0;
   font-family: 'Segoe UI','Poppins', sans-serif;
   background: linear-gradient(to right, #6a11cb, #2575fc);
-  height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
   -webkit-font-smoothing:antialiased;
+  padding: 16px;
  }
  h2{
   font-size: 26px;
@@ -32,14 +36,26 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 30px;
   width: 500px;
+  max-width: 520px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
-  padding: 30px;
   border-radius: 12px;
-  width: 550px;
   text-align: center;
-  max-height: 80vh;
+  max-height: 70dvh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media(max-width: 500px){
+  .box{
+    width: 70%;
+    max-width: 380px;
+    padding: 22px;
+  }
+  h2{
+    font-size: 20px;
+  }
 }
 .fileCard {
   animation: fadeIn 0.3s ease;
@@ -72,6 +88,15 @@ button {
 button:hover {
   background: #1a5edb;
 }
+#fileList{
+  max-height: 250px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#fileList::-webkit-scrollbar{
+  display: none;
+}
 </style>
 </head>
 
@@ -89,7 +114,7 @@ button:hover {
 <p style="color:rgba(255, 255, 255, 0.9); font-weight:500;">Max file size: 5MB per file</p>
 
 <div id="fileList"></div>
-<div style="margin-top:20px; text-align:center;">
+<div style=" text-align:center;">
   <button id="uploadBtn" style="transition:0.2s; padding:12px 26px;font-size: 17px; border-radius: 8px;"
    onmouseover="this.style.transform='scale(1.05)'"
    onmouseout="this.style.transform='scale(1)'">Upload</button>
@@ -113,7 +138,6 @@ button:hover {
   </button>
 </div>
 </div>
-
 <script>
 const fileInput = document.getElementById("fileInput");
 const dropArea = document.getElementById("dropArea");
