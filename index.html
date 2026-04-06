@@ -7,7 +7,6 @@
 <meta name ="viewport"
 content="width=device-width,initial-scale=1.0">
 <title>Cloud File Upload</title>
-
 <style>
 body {
   margin: 0;
@@ -20,13 +19,43 @@ body {
   -webkit-font-smoothing:antialiased;
   padding: 16px;
  }
+ .main-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+ }
  h2{
   font-size: 26px;
   font-weight: bolder;
   letter-spacing: 0.5px;
   color: #1e293b;
 }
+.title {
+  text-align: center;
+  color: white;
+  margin-bottom: 30px;
+}
 
+.title h1 {
+  margin: 0;
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  margin-bottom: 5px;
+  color: whitesmoke;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.title h1 span{
+  color: #7df9ff
+}
+.title p {
+  margin: 5px 0 0;
+  font-size: 1.1rem;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
 .box {
   /* background: rgba(255,255,255,0.95); */
   background: rgba(255, 255, 255, 0.55); /* transparent glass */
@@ -97,11 +126,53 @@ button:hover {
 #fileList::-webkit-scrollbar{
   display: none;
 }
+.logo-text {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    
+    /* This creates a gradient that flows through the whole word */
+    background: linear-gradient(
+        120deg, 
+        #ffffff 30%, 
+        #7df9ff 50%, 
+        #ffffff 70%
+    );
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* Animation: This makes the color "shimmer" slightly */
+    animation: shine 5s linear infinite;
+    
+    /* Subtle glow so it doesn't get lost in the blue background */
+    filter: drop-shadow(0 2px 15px rgba(125, 249, 255, 0.3));
+}
+
+.logo-text span {
+    /* Making the X slightly more intense than the rest */
+    font-weight: 900;
+    filter: brightness(1.2);
+}
+
+@keyframes shine {
+    to {
+        background-position: 200% center;
+    }
+}
+
 </style>
 </head>
 
 <body>
-
+<div class="main-container">
+<div class="title">
+  <h1 class="logo-text">CloudShare<span>X</span></h1>
+  <p>Secure File Upload System</p>
+</div>
+<div class="upload-box">
+</div>
 <div class="box">
 
 <h2>Upload File to Cloud ☁️</h2>
@@ -136,6 +207,7 @@ button:hover {
   ">
     🗑️ Remove All
   </button>
+</div>
 </div>
 </div>
 <script>
