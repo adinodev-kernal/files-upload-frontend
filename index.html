@@ -92,10 +92,16 @@ body {
   backdrop-filter: blur(10px);
   border-radius: 12px;
   text-align: center;
-  max-height: 70dvh;
+  height: auto;
+  max-height: 85dvh;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.box::-webkit-scrollbar {
+  display: none;
 }
 
 @media(max-width: 500px){
@@ -103,6 +109,8 @@ body {
     width: 70%;
     max-width: 380px;
     padding: 22px;
+     height: auto;
+     max-height: 80dvh;
   }
   h2{
     font-size: 20px;
@@ -140,10 +148,16 @@ button:hover {
   background: #1a5edb;
 }
 #fileList{
-  max-height: 250px;
+  width: 100%;
+  flex-grow: 1;
+  height: auto;
+  min-height: 10px;
+  max-height: 350px;
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  display: block;
 }
 #fileList::-webkit-scrollbar{
   display: none;
