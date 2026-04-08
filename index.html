@@ -247,24 +247,24 @@ button:hover {
 </div>
 </div>
 <script>
-const fileInput = document.getElementById("fileInput");
+const fileInput = document.getElementById("fileInput");  // Initializing variables, grabbing all the necessary elements
 const dropArea = document.getElementById("dropArea");
 const fileList = document.getElementById("fileList");
 const uploadBtn = document.getElementById("uploadBtn");
 const removeAllBtn = document.getElementById("removeAllBtn");
 const sasInfo = document.getElementById("sasInfo");
 
-let filesArray = [];
+let filesArray = [];   //holds the actual file objects that will be sent to cloud
 
-// Click select
+// Click to open file dialogue
 dropArea.addEventListener("click", () => fileInput.click());
 
-// Select files
+// Capture files when selected via dialogue
 fileInput.addEventListener("change", (e) => handleFiles(e.target.files));
 
-// Drag drop
+// Drag drop logic
 dropArea.addEventListener("dragover", (e) => {
-  e.preventDefault();
+  e.preventDefault(); // without it the browser would simply display file like an image instead of letting your script handle it
   dropArea.classList.add("dragover");
 });
 
@@ -275,19 +275,19 @@ dropArea.addEventListener("dragleave", () => {
 dropArea.addEventListener("drop", (e) => {
   e.preventDefault();
   dropArea.classList.remove("dragover");
-  handleFiles(e.dataTransfer.files);
+  handleFiles(e.dataTransfer.files); 
 });
 
-// Handle files
+// Handle files 
 function handleFiles(files) {
-  for (let file of files) {
+  for (let file of files) {        //it iterates through the selected files
 
-    if (file.size > 5 * 1024 * 1024) {
-      alert(file.name + " exceeds 5MB ❌");
-      continue;
+    if (file.size > 5 * 1024 * 1024) {      //set limits that an individual file must not exceed 5mb
+      alert(file.name + " exceeds 5MB ❌");  //send alert and continue to next file
+      continue;        
     }
 
-    filesArray.push(file);
+    filesArray.push(file); 
     renderFile(file);
   }
 }
@@ -295,7 +295,7 @@ function handleFiles(files) {
 // Render file
 function renderFile(file) {
 
-  removeAllBtn.style.display = "block";
+  removeAllBtn.style.display = "block";  //shows "remove all" button
 
   const div = document.createElement("div");
   div.classList.add("fileCard");
@@ -304,7 +304,8 @@ function renderFile(file) {
   div.style.marginTop = "15px";
   div.style.borderRadius = "10px";
 
-  div.innerHTML = `
+  // injects , filename , size and progress bar
+  div.innerHTML = `    
     <div style="display:flex; justify-content:space-between;">
       <div>
         <b>${file.name}</b><br>
@@ -332,10 +333,10 @@ function renderFile(file) {
     <div class="actions" style="display:flex; gap:10px;"></div>
   `;
 
-  // Remove before upload
+  // Logic to remove a specific file before uploading
   div.querySelector(".removeBtn").addEventListener("click", () => {
     div.remove();
-    filesArray = filesArray.filter(f => f !== file);
+    filesArray = filesArray.filter(f => f !== file); //if you delete the file from screen the actual files will also be deleted from the screen so won't get uploaded
 
     if (filesArray.length === 0) {
       removeAllBtn.style.display = "none";
@@ -350,18 +351,18 @@ function renderFile(file) {
 uploadBtn.addEventListener("click", async () => {
 
   if (filesArray.length === 0) {
-    alert("No files selected ❌");
+    alert("No files selected ❌");  //if no files are there , alert is issued
     return;
   }
-
+   // Fetch the secure SAS URL from your Node.js backend , so we are sending the files directly to cloud without uploading to backend
   const res = await fetch("https://files-upload-backend-1.onrender.com/get-sas");
-  const data = await res.json();
+  const data = await res.json();  
   const sasUrl = data.sasUrl;
 
   sasInfo.style.display = "block";
 
   const cards = fileList.children;
-
+// Loop through all selected files and start individual uploads
   for (let i = 0; i < filesArray.length; i++) {
     uploadSingle(filesArray[i], cards[i], sasUrl);
   }
@@ -369,17 +370,17 @@ uploadBtn.addEventListener("click", async () => {
 
 // Upload single
 function uploadSingle(file, card, sasUrl) {
-
-  const uploadUrl = sasUrl.replace("?", "/" + file.name + "?");
+// Inject the filename into the SAS URL for Azure
+const uploadUrl = sasUrl.replace("?", "/" + file.name + "?");
 const progressBar = card.querySelector(".progress");
-  const statusText = card.querySelector(".status");
-  const actions = card.querySelector(".actions");
+const statusText = card.querySelector(".status");
+const actions = card.querySelector(".actions");
 
-  progressBar.style.display = "block";
+  progressBar.style.display = "block"; //display progress bar
 
   let progress = 0;
-  const fakeProgress = setInterval(() => {
-    progress += 10;
+  const fakeProgress = setInterval(() => { //// Visual flourish: Fake progress movement
+    progress += 10;  
     if (progress <= 90) {
       progressBar.style.width = progress + "%";
     }
@@ -387,19 +388,19 @@ const progressBar = card.querySelector(".progress");
 
   const xhr = new XMLHttpRequest();
   xhr.open("PUT", uploadUrl);
-
+// Azure Cloud specific headers
   xhr.setRequestHeader("x-ms-blob-type", "BlockBlob");
   xhr.setRequestHeader("Content-Type", file.type);
 
   xhr.onload = () => {
     clearInterval(fakeProgress);
-    progressBar.style.width = "100%";
+    progressBar.style.width = "100%"; //when progress will be
 
-    if (xhr.status === 201) {
+    if (xhr.status === 201) {  // 201 = Created (Success in Azure)
 
-      statusText.innerHTML = "✅ Uploaded";
+      statusText.innerHTML = "✅ Uploaded"; //will show the uploaded status
 
-      const finalUrl = uploadUrl.split("?")[0];
+      const finalUrl = uploadUrl.split("?")[0]; //remove token for clean link
 
       actions.innerHTML = `
         <button onclick="window.open('${finalUrl}')"style="background:#28a745; transition:0.2s;"
@@ -407,40 +408,28 @@ onmouseover="this.style.background='#218838'"
 onmouseout="this.style.background='#28a745'"">🔓 Open</button>
         <button onclick="copyLink('${finalUrl}')">🔗 Copy Link</button>
       `;
-
-     /*  const removeBtn = actions.querySelector(".removeSingle");
-
-      removeBtn.addEventListener("click", () => {
-        card.remove();
-        filesArray = filesArray.filter(f => f !== file);
-
-        if (filesArray.length === 0) {
-          removeAllBtn.style.display = "none";
-          sasInfo.style.display = "none";
-        }
-      }); */
-
-    } else {
+    } 
+    else {
       statusText.innerHTML = "❌ Failed";
     }
   };
-
+// Start the actual data transfer
   xhr.send(file);
 }
 
 // Copy
 function copyLink(url) {
-  navigator.clipboard.writeText(url);
+  navigator.clipboard.writeText(url); //on clicking copy link , it will be copied to your clipboard
   alert("Copied!");
 }
 
 // Remove all
 removeAllBtn.addEventListener("click", () => {
-  fileList.innerHTML = "";
-  filesArray = [];
-  removeAllBtn.style.display = "none";
-  sasInfo.style.display = "none";
-});
+  fileList.innerHTML = "";   // clear UI
+  filesArray = [];  //reset state
+  removeAllBtn.style.display = "none"; //hide remove all button 
+  sasInfo.style.display = "none"; //hide sas info
+}); 
 </script>
 
 </body>
